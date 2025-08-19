@@ -1,5 +1,7 @@
 import { ExerciseDetectors } from './detectors.js';
-import { MicAnalyzer } from './mic.js';
+import { MicAnalyzer } from './mic.js'; 
+
+
 
 // UI
 const startBtn = document.getElementById('startBtn');

@@ -1,5 +1,7 @@
 // Análisis de micrófono para detectar transientes ("pop") y vibración de labios (trill) por modulación de amplitud.
 // Devuelve por frame: { rmsDb, transientDb, envelopeHz }
+
+
 // Expone this.stream (MediaStream) para mezclar en la grabación.
 
 export class MicAnalyzer {

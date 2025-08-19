@@ -5,6 +5,7 @@
 // - 1 (nariz/tabique), 152 (mentón)
 // Nota: los valores z de FaceMesh son relativos; usamos diferencias relativas.
 
+
 function hypot2(ax, ay, bx, by) {
   const dx = ax - bx, dy = ay - by;
   return Math.hypot(dx, dy);

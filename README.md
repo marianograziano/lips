@@ -7,7 +7,7 @@ Frontend básico para correr en local o en GitHub Pages que:
 - Permite grabar video (canvas con overlay) + audio (micrófono) en .webm.
 - Genera un log .json con las detecciones por frame durante la grabación.
 
-Ejercicios detectados:
+Ejercicios detectados:  
 - Trompa Lateral (izquierda/derecha)
 - Fruncir y Sonreír (secuencia fruncir → sonreír)
 - Mantener Trompa (barra de progreso)
