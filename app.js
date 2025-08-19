@@ -1,6 +1,5 @@
 import { ExerciseDetectors } from './detectors.js';
-import { MicAnalyzer } from './mic.js';
-
+import { MicAnalyzer } from './mic.js'; 
 
 
 // UI
@@ -186,8 +185,9 @@ async function initMediaPipe() {
   faceMesh.setOptions({
     maxNumFaces: 1,
     refineLandmarks: true,
-    minDetectionConfidence: 0.5,
-    minTrackingConfidence: 0.5
+    selfieMode: true,
+    minDetectionConfidence: 0.3,
+    minTrackingConfidence: 0.3
   });
   faceMesh.onResults(onResults);
 
@@ -232,13 +232,31 @@ function onResults(results) {
   ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
   ctx.drawImage(results.image, 0, 0, canvasEl.width, canvasEl.height);
 
-  if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
+  const hasLandmarks = !!(results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0);
+  if (hasLandmarks) {
     const landmarks = results.multiFaceLandmarks[0];
 
-    // Dibujo opcional del contorno de labios
+    // Dibujo opcional del contorno de labios (usar globals de MediaPipe)
     if (showLipsChk.checked && window.drawConnectors && window.FACEMESH_LIPS) {
-      const scaled = landmarks.map(pt => ({ x: pt.x * canvasEl.width, y: pt.y * canvasEl.height }));
-      drawConnectors(ctx, scaled, FACEMESH_LIPS, { color: '#4fd1c5', lineWidth: 2 });
+      try {
+        const scaled = landmarks.map(pt => ({ x: pt.x * canvasEl.width, y: pt.y * canvasEl.height }));
+        window.drawConnectors(ctx, scaled, window.FACEMESH_LIPS, { color: '#4fd1c5', lineWidth: 2 });
+
+        // Puntos de depuración mínimos (nariz y comisuras)
+        const debugIdx = [1, 61, 291, 13, 14];
+        ctx.fillStyle = '#4fd1c5';
+        for (const i of debugIdx) {
+          const p = landmarks[i];
+          if (!p) continue;
+          const x = p.x * canvasEl.width;
+          const y = p.y * canvasEl.height;
+          ctx.beginPath();
+          ctx.arc(x, y, 2.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      } catch (e) {
+        console.warn('No se pudo dibujar el contorno de labios:', e);
+      }
     }
 
     // Mic audio features (si está listo)
@@ -258,6 +276,9 @@ function onResults(results) {
         });
       }
     }
+  } else {
+    // Sin landmarks: evitar que el usuario crea que se congeló
+    setPill(statePill, 'Estado: listo (sin rostro)');
   }
 
   ctx.restore();
