@@ -5,7 +5,6 @@
 // - 1 (nariz/tabique), 152 (mentón)
 // Nota: los valores z de FaceMesh son relativos; usamos diferencias relativas.
 
-
 function hypot2(ax, ay, bx, by) {
   const dx = ax - bx, dy = ay - by;
   return Math.hypot(dx, dy);
@@ -145,7 +144,7 @@ export class ExerciseDetectors {
 
     // Señales base
     const isPucker = protrusion > puckerProtrusion && ratioVH < puckerNarrow;
-    const isSmile = ratioVH < (mouthClosed * 0.8) && f.cornersUp > smileCornersUp && (f.mouthW > 0.4);
+    const isSmile = ratioVH < (mouthClosed * 0.9) && f.cornersUp > (smileCornersUp * 0.9) && (f.mouthW > 0.10);
     const isClosed = ratioVH < mouthClosed;
     const isOpen = ratioVH > mouthOpen;
 
