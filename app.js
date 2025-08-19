@@ -1,5 +1,5 @@
 import { ExerciseDetectors } from './detectors.js';
-import { MicAnalyzer } from './mic.js'; 
+import { MicAnalyzer } from './mic.js';
 
 
 
@@ -175,7 +175,12 @@ function downloadBlob(blob, filename) {
 
 // Init MediaPipe
 async function initMediaPipe() {
-  faceMesh = new FaceMesh.FaceMesh({
+  // Compat: algunas builds exponen FaceMesh como clase directa y otras como namespace.FaceMesh
+  const FaceMeshCtor = window.FaceMesh?.FaceMesh || window.FaceMesh;
+  if (!FaceMeshCtor) {
+    throw new Error('MediaPipe FaceMesh no se cargó. Revisa las etiquetas <script> y la consola.');
+  }
+  faceMesh = new FaceMeshCtor({
     locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4/${file}`
   });
   faceMesh.setOptions({
@@ -186,7 +191,12 @@ async function initMediaPipe() {
   });
   faceMesh.onResults(onResults);
 
-  camera = new Camera(videoEl, {
+  // Compat para Camera (algunas builds lo exponen en window.Camera)
+  const CameraCtor = window.Camera || window.cameraUtils?.Camera || window.CameraUtils?.Camera;
+  if (!CameraCtor) {
+    throw new Error('MediaPipe CameraUtils no se cargó. Revisa la etiqueta camera_utils.js');
+  }
+  camera = new CameraCtor(videoEl, {
     onFrame: async () => { await faceMesh.send({ image: videoEl }); },
     width: 640,
     height: 480
@@ -203,7 +213,12 @@ async function initDetectorsAndMic() {
     holdSeconds: 3.0
   });
   mic = new MicAnalyzer();
-  await mic.init();
+  try {
+    await mic.init();
+  } catch (e) {
+    console.warn('Micrófono no disponible, continúo sin audio:', e);
+    mic = null;
+  }
 }
 
 // Render + detection loop (called by MediaPipe)
